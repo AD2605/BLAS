@@ -62,4 +62,28 @@ namespace blas1{
             output[local_column * height + local_row] = sharedMem[threadIdx.x][threadIdx.y];
         }
     }
+
+    __global__ void transposeRowBlock_32(float* input, float* output, size_t width, size_t heights){
+        const unsigned int TILE_SIZE = 32;
+        const unsigned int BLOCK_ROWS = 8;
+
+        __shared__ float tile[TILE_SIZE][TILE_SIZE+1];
+
+        unsigned int x = blockIdx.x * TILE_SIZE + threadIdx.x;
+        unsigned int y = blockIdx.y * TILE_SIZE + threadIdx.y;
+        auto w = gridDim.x * TILE_SIZE;
+
+        for(int j=0; j<TILE_SIZE; j += BLOCK_ROWS){
+            tile[threadIdx.y + j][threadIdx.x] = input[(y + j) * w + x];
+        }
+        __syncthreads();
+
+        auto local_row = blockIdx.y * TILE_SIZE + threadIdx.x;
+        auto local_column = blockIdx.x * TILE_SIZE + threadIdx.y;
+
+#pragma unroll
+        for(int j = 0; j < TILE_SIZE; j += BLOCK_ROWS){
+            output[ (local_column + j) * w + local_row] = tile[threadIdx.x][threadIdx.y + j];
+        }
+    }
 }
