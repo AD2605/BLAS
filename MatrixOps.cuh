@@ -8,7 +8,7 @@ namespace blas1{
 
     __global__ void transpose_16(float* input, float* output, size_t width, size_t height);
 
-    __global__ void transposeRowBlock_32(float* input, float* output, size_t width, size_t heights)
+    __global__ void transposeRowBlock_32(float* input, float* output, size_t width, size_t heights);
 }
 
 
