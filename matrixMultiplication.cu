@@ -1,8 +1,6 @@
 #include <iostream>
 #include "matrixMultiplication.cuh"
 
-
-
 namespace blas3{
 
     __global__ void naiveMatrixMultiplication(float* MatA, float* MatB, float* result, size_t m, size_t n, size_t k){

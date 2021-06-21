@@ -3,7 +3,8 @@ project(MatrixMultiplication CUDA)
 
 set(CMAKE_CUDA_STANDARD 14)
 
-add_executable(MatrixMultiplication main.cu matrixMultiplication.cu matrixMultiplication.cuh)
+add_executable(MatrixMultiplication main.cu matrixMultiplication.cu matrixMultiplication.cuh MatrixOps.cu MatrixOps.cuh
+        vectorOps.cu vectorOps.cuh defines.cuh)
 set_property(TARGET MatrixMultiplication PROPERTY CUDA_ARCHITECTURES 75)
 
 
