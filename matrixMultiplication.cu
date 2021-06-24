@@ -221,7 +221,7 @@ namespace blas3{
     }
 
     __global__ void sharedGEMM(float* MatA, float* MatB, float* Result, size_t M, size_t N, size_t K){
-        const unsigned int TILE_SIZE = 16*2;
+        const unsigned int TILE_SIZE =32;
 
         unsigned int row_id = blockIdx.y * TILE_SIZE + threadIdx.y;
         unsigned int column_id = blockIdx.x * TILE_SIZE + threadIdx.x;
@@ -231,7 +231,7 @@ namespace blas3{
 
         float sum = 0.0f;
 
-        for(size_t m = 0; m < (TILE_SIZE + M -1)/TILE_SIZE; m++){
+        for(size_t m = 0; m < (TILE_SIZE + N - 1)/TILE_SIZE; m++){
             if(m * TILE_SIZE + threadIdx.x < N and row_id < M)
                 A_shared[threadIdx.y][threadIdx.x] = MatA[row_id * N + m * TILE_SIZE + threadIdx.x];
             else
@@ -247,7 +247,7 @@ namespace blas3{
 
 
             for(int n=0; n<TILE_SIZE; n++){
-                sum += A_shared[threadIdx.y][n] + B_shared[n][threadIdx.x];
+                sum += A_shared[threadIdx.y][n] * B_shared[n][threadIdx.x];
             }
             __syncthreads();
         }
@@ -258,3 +258,46 @@ namespace blas3{
     }
 
 }
+
+/*
+int main(){
+    size_t m = 102;
+    size_t n = 604;
+    size_t k = 366;
+
+    float* h_a, *h_b, *h_c;
+    float* d_a, *d_b, *d_c;
+
+    h_a = (float*) malloc(m * n * sizeof(float ));
+    h_b = (float*) malloc(n * k * sizeof(float ));
+    h_c = (float*) malloc(m * k * sizeof(float ));
+
+    cudaMalloc(&d_a, m * n * sizeof(float ));
+    cudaMalloc(&d_b, n * k * sizeof(float ));
+    cudaMalloc(&d_c, m * k * sizeof(float ));
+
+
+    for(int i = 0; i < m * n;i++){
+        h_a[i] = 1.0f;
+    }
+
+    for(int i=0; i< n*k; i++){
+        h_b[i] = 1.0f;
+    }
+
+    cudaMemcpy(d_a, h_a, m * n * sizeof(float ), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_b, h_b, n * k * sizeof(float ), cudaMemcpyHostToDevice);
+
+    dim3 threads(32, 32);
+    dim3 blocksPerGrid((n - 1) / threads.x + 1, (n - 1) / threads.y + 1);
+
+    blas3::sharedGEMM<<<blocksPerGrid, threads>>>(d_a, d_b, d_c, m ,n, k);
+    cudaDeviceSynchronize();
+    cudaMemcpy(h_c, d_c, m * k * sizeof(float ), cudaMemcpyDeviceToHost);
+    for(int i=0; i<500; i++){
+        std::cout<<h_c[i]<<"  ";
+    }
+    std::cout<<std::endl;
+}
+
+ */
