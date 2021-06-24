@@ -3,9 +3,9 @@
 
 namespace blas3 {
 
-    __global__ void sharedMatrixMultiplication(float *MatA, float *MatB, float *result, size_t M, size_t K, size_t N);
-
     __global__ void naiveMatrixMultiplication(float *MatA, float *MatB, float *result, size_t m, size_t n, size_t k);
+
+    __global__ void sharedMatrixMultiplication(float *MatA, float *MatB, float *result, size_t M, size_t K, size_t N);
 
     __global__ void MatrixMultiplication_reducedOps32(float* MatA, float* MatB, float* result, size_t M, size_t N, size_t K);
 
