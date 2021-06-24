@@ -12,9 +12,9 @@ namespace blas3{
         if(row_id < m && column_id < k) {
 
             for (size_t i = 0; i < k; i++) {
-                sum += MatA[m * row_id + i] * MatB[i * k + column_id];
+                sum += MatA[n * row_id + i] * MatB[i * k + column_id];
             }
-            result[row_id * m + column_id] = sum;
+            result[row_id * n + column_id] = sum;
         }
     }
 
