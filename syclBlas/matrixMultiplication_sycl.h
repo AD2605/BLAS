@@ -15,6 +15,9 @@ namespace blas3{
         void naiveMatrixMultiplication(sycl_buffer MatA, sycl_buffer MatB, sycl_buffer result, size_t M, size_t N, size_t K,
                                        queue deviceQueue, int numThreads);
 
+        void sharedMatrixMultiplication(sycl_buffer MatrixA, sycl_buffer MatrixB, sycl_buffer Result, size_t M, size_t N, size_t K,
+                                        queue deviceQueue, size_t TILE_SIZE);
+
     }
 }
 
