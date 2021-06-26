@@ -18,6 +18,12 @@ namespace blas3{
         void sharedMatrixMultiplication(sycl_buffer MatrixA, sycl_buffer MatrixB, sycl_buffer Result, size_t M, size_t N, size_t K,
                                         queue deviceQueue, size_t TILE_SIZE);
 
+        void sharedGEMM(sycl_buffer MatrixA, sycl_buffer MatrixB, sycl_buffer Result, size_t M, size_t N, size_t K,
+                        queue deviceQueue, size_t TILE_SIZE);
+
+        void matmul_reducedOps_sycl(sycl_buffer MatA, sycl_buffer MatB, sycl_buffer result, size_t M, size_t N, size_t K,
+                                    int TILE_SIZE, int VECTOR_SIZE, queue deviceQueue);
+
     }
 }
 
