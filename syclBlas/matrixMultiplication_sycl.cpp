@@ -193,10 +193,15 @@ namespace blas3{
                 accessor<float, 1, access::mode::read_write, access::target::local> A_shared{range<1>(TILE_SIZE * TILE_SIZE),
                         cgh};
 
-                accessor<float, 1, access::mode::read_write, access::target::local> result_vector{range<1>(TILE_SIZE), cgh};
-
                 cgh.parallel_for(launchParams, [MatA_accessor, MatB_accessor, result_accessor, A_shared, M, N, K,
-                                                VECTOR_SIZE, TILE_SIZE, result_vector](nd_item<2> item){
+                                                VECTOR_SIZE, TILE_SIZE](nd_item<2> item){
+
+                    float result_vector[TILE_SIZE];
+
+#pragma unroll
+                    for (int i = 0; i < TILE_SIZE; ++i) {
+                        result_vector[i] = 0.0f;
+                    }
 
                     unsigned int block_x = item.get_group(0); unsigned int thread_x = item.get_local_id(0);
                     unsigned int block_y = item.get_group(1); unsigned int thread_y = item.get_local_id(1);
