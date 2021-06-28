@@ -1,9 +1,11 @@
 
-#include "matrixMultiplication_sycl.h"
+#include "../include/matrixMultiplication_sycl.h"
+#include "../include/defines.h"
+
 #include <CL/sycl.hpp>
 #include <iostream>
 
-typedef std::unique_ptr<cl::sycl::buffer<float, 1>> sycl_buffer;
+
 
 using namespace cl::sycl;
 
