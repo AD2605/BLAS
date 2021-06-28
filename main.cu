@@ -1,6 +1,6 @@
 #include <iostream>
 #include <cassert>
-#include "matrixMultiplication.cuh"
+#include "cudaBlas/matrixMultiplication.cuh"
 
 int main() {
     size_t m = 1024;
