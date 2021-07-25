@@ -19,8 +19,10 @@ namespace blas3{
         void naiveMatrixMultiplication(sycl_buffer MatA, sycl_buffer MatB, sycl_buffer result, size_t M, size_t N, size_t K,
                                         queue deviceQueue, int numThreads){
 
-            nd_range<2> launchParams = nd_range<2>(cl::sycl::range<2>(M / numThreads + 1, K / numThreads + 1),
-                    cl::sycl::range<2>(numThreads, numThreads));
+            auto local_range = range<2>(numThreads, numThreads);
+            auto global_range = range<2>(M / numThreads + 1, K / numThreads + 1) * local_range;
+
+            auto launchParams = nd_range<2>(global_range, local_range);
 
             deviceQueue.submit([&MatA, &MatB, &result, M, N, K, launchParams](handler& cgh){
 
@@ -42,16 +44,18 @@ namespace blas3{
                         result_accessor[N * row_index + column_index] = sum;
                     }
                 });
-            });
-            deviceQueue.wait();
+            }).wait();
 
         }
 
         void sharedMatrixMultiplication(sycl_buffer MatrixA, sycl_buffer MatrixB, sycl_buffer Result, size_t M, size_t N, size_t K,
                                         queue deviceQueue, size_t TILE_SIZE){
 
-            nd_range<2> launchParams = nd_range<2>(cl::sycl::range<2>(M / TILE_SIZE, K / TILE_SIZE),
-                                                   cl::sycl::range<2>(TILE_SIZE, TILE_SIZE));
+            auto local_range = range<2>(TILE_SIZE, TILE_SIZE);
+            auto global_range = range<2>(M / TILE_SIZE, K / TILE_SIZE) * local_range;
+
+            auto launchParams = nd_range<2>(global_range, local_range);
+
 
             deviceQueue.submit([&MatrixA, &MatrixB, &Result, M, N, K, launchParams, TILE_SIZE](handler& cgh){
 
@@ -113,8 +117,11 @@ namespace blas3{
 
             auto device = deviceQueue.get_device();
 
-            nd_range<2> launchParams = nd_range<2>(range<2>(M / TILE_SIZE + 1, K / TILE_SIZE + 1),
-                                                            range<2>(TILE_SIZE, TILE_SIZE));
+            auto local_range = range<2>(TILE_SIZE, TILE_SIZE);
+            auto global_range = range<2>(M / TILE_SIZE + 1, K / TILE_SIZE + 1) * local_range;
+
+            auto launchParams = nd_range<2>(global_range, local_range);
+
 
             deviceQueue.submit([&MatrixA, &MatrixB, &Result, M, N, K, TILE_SIZE, launchParams](handler& cgh){
 
