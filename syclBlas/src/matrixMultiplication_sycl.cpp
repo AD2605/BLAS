@@ -9,8 +9,6 @@
 
 using namespace cl::sycl;
 
-class naive_MatMul_kernel;
-class sharedMatrixMultiplication_kernel;
 
 namespace blas3{
 
