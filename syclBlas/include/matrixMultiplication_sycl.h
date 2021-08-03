@@ -10,6 +10,7 @@ using namespace  cl::sycl;
 
 class naive_MatMul_kernel;
 class sharedMatrixMultiplication_kernel;
+class matmulreducedOps;
 
 
 namespace blas3{

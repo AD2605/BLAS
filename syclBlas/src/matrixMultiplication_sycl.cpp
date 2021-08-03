@@ -132,7 +132,7 @@ namespace blas3{
                 accessor<float, 2, access::mode::read_write, access::target::local> B_shared(range<2>(TILE_SIZE,
                                                                                                       TILE_SIZE), cgh);
 
-                cgh.parallel_for(launchParams, [MatA_accessor, MatB_accessor, result_accessor, A_shared, B_shared,
+                cgh.parallel_for<class sharedGemm>(launchParams, [MatA_accessor, MatB_accessor, result_accessor, A_shared, B_shared,
                                                 M, N, K, TILE_SIZE](nd_item<2> item){
                     /*
                     unsigned int group_id_x = item.get_group(0);
@@ -188,8 +188,11 @@ namespace blas3{
         void matmul_reducedOps_sycl(sycl_buffer MatA, sycl_buffer MatB, sycl_buffer result, size_t M, size_t N, size_t K,
                                     int TILE_SIZE, int VECTOR_SIZE, queue deviceQueue){
 
-            nd_range<2> launchParams = nd_range<2>(range<2> (K / (TILE_SIZE * VECTOR_SIZE), M / TILE_SIZE),
-                    range<2>(TILE_SIZE, VECTOR_SIZE));
+            auto local_range = range<2>(TILE_SIZE, VECTOR_SIZE);
+            auto global_range = range<2>(K / (TILE_SIZE * VECTOR_SIZE), M / (TILE_SIZE)) * local_range;
+
+            nd_range<2> launchParams = nd_range<2>(global_range, local_range);
+
 
             deviceQueue.submit([&MatA, &MatB, &result, M, N, K, TILE_SIZE, VECTOR_SIZE, launchParams](handler& cgh){
 
@@ -200,7 +203,7 @@ namespace blas3{
                 accessor<float, 1, access::mode::read_write, access::target::local> A_shared{range<1>(TILE_SIZE * TILE_SIZE),
                         cgh};
 
-                cgh.parallel_for(launchParams, [MatA_accessor, MatB_accessor, result_accessor, A_shared, M, N, K,
+                cgh.parallel_for<matmulreducedOps>(launchParams, [MatA_accessor, MatB_accessor, result_accessor, A_shared, M, N, K,
                                                 VECTOR_SIZE, TILE_SIZE](nd_item<2> item){
 
                     float result_vector[TILE_SIZE];
