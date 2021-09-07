@@ -10,6 +10,6 @@ Currently the following have been implemented -
 * Optimization in terms of number of instructions via outer product
 
 ### Level 1 BLAS
-* Dot Product (A hybrid CPU GPU algorithm)
+* Dot Product
 * Array/ Matrix Copy
 * Matrix Transpose
