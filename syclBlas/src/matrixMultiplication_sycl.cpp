@@ -185,8 +185,9 @@ namespace blas3{
             deviceQueue.wait();
         }
 
+        template<int TILE_SIZE, INT VECTOR_SIZE>
         void matmul_reducedOps_sycl(sycl_buffer MatA, sycl_buffer MatB, sycl_buffer result, size_t M, size_t N, size_t K,
-                                    int TILE_SIZE, int VECTOR_SIZE, queue deviceQueue){
+                                   queue deviceQueue){
 
             auto local_range = range<2>(TILE_SIZE, VECTOR_SIZE);
             auto global_range = range<2>(K / (TILE_SIZE * VECTOR_SIZE), M / (TILE_SIZE)) * local_range;
@@ -203,7 +204,7 @@ namespace blas3{
                 accessor<float, 1, access::mode::read_write, access::target::local> A_shared{range<1>(TILE_SIZE * TILE_SIZE),
                         cgh};
 
-                cgh.parallel_for<matmulreducedOps>(launchParams, [MatA_accessor, MatB_accessor, result_accessor, A_shared, M, N, K,
+                cgh.parallel_for<matmulreducedOps<TILE_SIZE, VECTOR_SIZE>>(launchParams, [MatA_accessor, MatB_accessor, result_accessor, A_shared, M, N, K,
                                                 VECTOR_SIZE, TILE_SIZE](nd_item<2> item){
 
                     float result_vector[TILE_SIZE];
